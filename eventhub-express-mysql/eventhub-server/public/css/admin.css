@@ -1,0 +1,84 @@
+/* ==========================================================================
+   Feature 7: Admin Portal — page-specific styles
+   OWNERSHIP: [teammate name]
+   ========================================================================== */
+
+.table-wrap { overflow-x: auto; border: 2px solid var(--ink); border-radius: var(--radius); }
+
+table.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--white);
+  font-size: 0.88rem;
+}
+
+table.data-table th {
+  font-family: var(--font-label);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-align: left;
+  padding: 12px 14px;
+  background: var(--ink);
+  color: var(--paper);
+}
+
+table.data-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+
+table.data-table tr:last-child td { border-bottom: none; }
+
+.status-pill {
+  display: inline-block;
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.status-active { background: var(--sage); color: var(--white); }
+.status-flagged { background: var(--marigold); color: var(--ink); }
+.status-removed, .status-suspended { background: var(--coral); color: var(--white); }
+.status-open { background: var(--coral); color: var(--white); }
+.status-resolved, .status-dismissed { background: var(--line); color: var(--ink-soft); }
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: var(--white);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+
+.stat-card .stat-number { font-family: var(--font-display); font-size: 2rem; }
+.stat-card .stat-label { font-family: var(--font-label); font-size: 0.78rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.05em; }
+
+.inline-form { display: inline; }
+
+.admin-tabs { display: flex; gap: 4px; border-bottom: 2px solid var(--ink); margin-bottom: 24px; flex-wrap: wrap; }
+
+.admin-tabs a {
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-decoration: none;
+  color: var(--ink-soft);
+  padding: 10px 16px;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+}
+
+.admin-tabs a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--coral); }

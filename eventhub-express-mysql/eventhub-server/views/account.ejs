@@ -1,0 +1,73 @@
+<%- include('partials/header', { title, pageCss }) %>
+
+<section class="section">
+  <div class="container">
+    <p class="eyebrow">Feature 2 · Account Webpage</p>
+
+    <div class="profile-header">
+      <div class="avatar"><%= currentUser.name.charAt(0).toUpperCase() %></div>
+      <div>
+        <h1 style="margin-bottom:2px;"><%= currentUser.name %></h1>
+        <p style="color:var(--ink-soft);margin:0;"><%= currentUser.email %></p>
+        <span class="badge" style="margin-top:6px;"><%= currentUser.role %></span>
+      </div>
+    </div>
+
+    <div class="section-title">
+      <h2>Saved favourites</h2>
+    </div>
+
+    <% if (favourites.length) { %>
+      <div class="event-grid">
+        <% favourites.forEach(evt => { %>
+          <%- include('partials/event-card', { evt, href: `/events/${evt.id}` }) %>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <div class="empty-state">
+        <h3>No saved events yet</h3>
+        <p>Browse events and tap "Save" to add them here.</p>
+        <a class="btn btn-sm" href="/" style="margin-top:12px;">Browse Events</a>
+      </div>
+    <% } %>
+
+    <% if (currentUser.role === 'organiser') { %>
+      <div style="margin-top:48px;">
+        <div class="section-title">
+          <h2>My listings</h2>
+          <button class="btn btn-sm" id="new-listing-btn">+ New Listing</button>
+        </div>
+
+        <form id="listing-form" class="form-card" method="POST" action="/account/listings" style="max-width:100%;display:none;margin-bottom:24px;">
+          <div class="field"><label for="title">Event title</label><input type="text" id="title" name="title" required></div>
+          <div class="field"><label for="category">Category</label><input type="text" id="category" name="category" placeholder="e.g. Flea Market" required></div>
+          <div class="field"><label for="eventDate">Date</label><input type="date" id="eventDate" name="eventDate" required></div>
+          <div class="field"><label for="eventTime">Time</label><input type="time" id="eventTime" name="eventTime" required></div>
+          <div class="field"><label for="venue">Venue</label><input type="text" id="venue" name="venue" required></div>
+          <div class="field"><label for="description">Short description</label><textarea id="description" name="description" rows="3" required></textarea></div>
+          <div class="field"><label for="externalUrl">Registration link (your website / social page)</label><input type="url" id="externalUrl" name="externalUrl" placeholder="https://" required></div>
+          <button type="submit" class="btn btn-block">Publish Listing</button>
+        </form>
+
+        <% if (listings.length) { %>
+          <div class="event-grid">
+            <% listings.forEach(evt => { %>
+              <div style="position:relative;">
+                <%- include('partials/event-card', { evt, href: `/events/${evt.id}` }) %>
+                <span class="status-pill status-<%= evt.status %>" style="position:absolute;top:8px;right:8px;"><%= evt.status %></span>
+              </div>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <div class="empty-state">
+            <h3>No listings yet</h3>
+            <p>Create your first event listing above.</p>
+          </div>
+        <% } %>
+      </div>
+    <% } %>
+
+  </div>
+</section>
+
+<%- include('partials/footer') %>

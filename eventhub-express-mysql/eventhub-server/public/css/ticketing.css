@@ -1,0 +1,62 @@
+/* ==========================================================================
+   Feature 6: Ticketing — page-specific styles
+   OWNERSHIP: [teammate name]
+   ========================================================================== */
+
+.ticket-summary {
+  background: var(--white);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  padding: 0;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.ticket-summary-top { padding: 24px; }
+
+.ticket-summary-divider {
+  position: relative;
+  border-top: 2px dashed var(--line);
+  margin: 0;
+}
+
+.ticket-summary-divider::before,
+.ticket-summary-divider::after {
+  content: "";
+  position: absolute;
+  top: -12px;
+  width: 24px;
+  height: 24px;
+  background: var(--paper);
+  border-radius: 50%;
+  border: 2px solid var(--ink);
+}
+
+.ticket-summary-divider::before { left: -13px; }
+.ticket-summary-divider::after { right: -13px; }
+
+.ticket-summary-bottom {
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--paper-2);
+}
+
+.ticket-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 0.92rem;
+}
+
+.security-note {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  background: var(--paper-2);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}

@@ -1,0 +1,39 @@
+<%- include('../partials/header', { title, active }) %>
+
+<section class="section">
+  <div class="container">
+    <%- include('../partials/admin-tabs', { adminTab }) %>
+
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-number"><%= stats.users %></div><div class="stat-label">Total accounts</div></div>
+      <div class="stat-card"><div class="stat-number"><%= stats.events %></div><div class="stat-label">Live listings</div></div>
+      <div class="stat-card"><div class="stat-number"><%= stats.flagged %></div><div class="stat-label">Flagged events</div></div>
+      <div class="stat-card"><div class="stat-number"><%= stats.openReports %></div><div class="stat-label">Open reports</div></div>
+      <div class="stat-card"><div class="stat-number"><%= stats.suspended %></div><div class="stat-label">Suspended accounts</div></div>
+    </div>
+
+    <div class="section-title"><h2>Recent admin activity</h2></div>
+
+    <% if (recentActions.length) { %>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Admin</th><th>Action</th><th>Target</th><th>When</th></tr></thead>
+          <tbody>
+            <% recentActions.forEach(a => { %>
+              <tr>
+                <td><%= a.admin_name %></td>
+                <td><%= a.action %></td>
+                <td><%= a.target_type %> #<%= a.target_id %></td>
+                <td><%= new Date(a.created_at).toLocaleString('en-SG') %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <div class="empty-state"><h3>No activity yet</h3><p>Actions taken on events, accounts, and reports will show up here.</p></div>
+    <% } %>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,41 @@
+/* ==========================================================================
+   Feature 3: Reviews & Comments — page-specific styles
+   OWNERSHIP: [teammate name]
+   ========================================================================== */
+
+.star-input {
+  display: flex;
+  gap: 4px;
+}
+
+.star {
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--line);
+  cursor: pointer;
+  padding: 2px;
+}
+
+.star.is-filled { color: var(--marigold); }
+
+.review-item {
+  border-bottom: 1px solid var(--line);
+  padding: 16px 0;
+}
+
+.review-item:last-child { border-bottom: none; }
+
+.review-stars { color: var(--marigold); letter-spacing: 2px; font-size: 0.9rem; }
+
+.review-meta {
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.review-date { color: var(--ink-soft); font-weight: 400; }

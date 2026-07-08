@@ -1,0 +1,14 @@
+<footer class="site-footer">
+  <div class="container" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <span>EventHub — a LaunchLab student project.</span>
+    <span>Prototype build · Express / EJS / MySQL</span>
+  </div>
+</footer>
+
+<script src="/js/main.js"></script>
+<% if (typeof pageJs !== 'undefined' && pageJs) { %>
+  <script src="/js/<%= pageJs %>.js"></script>
+<% } %>
+
+</body>
+</html>

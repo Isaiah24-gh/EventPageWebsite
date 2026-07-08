@@ -1,0 +1,12 @@
+<%- include('partials/header', { title: 'Something Went Wrong' }) %>
+<section class="section">
+  <div class="container">
+    <div class="empty-state">
+      <h1 style="font-size:2rem;">500</h1>
+      <p>Something went wrong on our end.</p>
+      <p class="field-hint"><%= typeof message !== 'undefined' ? message : '' %></p>
+      <a class="btn btn-sm" href="/">Back to Browse</a>
+    </div>
+  </div>
+</section>
+<%- include('partials/footer') %>

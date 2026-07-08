@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title><%= typeof title !== 'undefined' ? title + ' — EventHub' : 'EventHub' %></title>
+<link rel="stylesheet" href="/css/style.css">
+<% if (typeof pageCss !== 'undefined' && pageCss) { %>
+  <link rel="stylesheet" href="/css/<%= pageCss %>.css">
+<% } %>
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav">
+    <a class="brand" href="/"><span class="brand-mark"></span>EventHub</a>
+    <ul class="nav-links">
+      <li><a href="/" <%= typeof active !== 'undefined' && active === 'browse' ? 'aria-current="page"' : '' %>>Browse</a></li>
+      <li><a href="/notifications" <%= typeof active !== 'undefined' && active === 'notifications' ? 'aria-current="page"' : '' %>>Reminders</a></li>
+      <li><a href="/email-preferences" <%= typeof active !== 'undefined' && active === 'email' ? 'aria-current="page"' : '' %>>Email Updates</a></li>
+      <% if (currentUser && currentUser.role === 'admin') { %>
+        <li><a href="/admin" <%= typeof active !== 'undefined' && active === 'admin' ? 'aria-current="page"' : '' %>>Admin</a></li>
+      <% } %>
+    </ul>
+    <div class="nav-actions">
+      <% if (currentUser) { %>
+        <a class="btn btn-sm" href="/account">My Account</a>
+        <form action="/logout" method="POST" style="margin:0;">
+          <button type="submit" class="btn btn-secondary btn-sm">Log Out</button>
+        </form>
+      <% } else { %>
+        <a class="btn btn-secondary btn-sm" href="/register">Sign Up</a>
+        <a class="btn btn-sm" href="/login">Log In</a>
+      <% } %>
+    </div>
+  </nav>
+</header>
+
+<% if (flashSuccess && flashSuccess.length) { %>
+  <div class="flash flash-success"><div class="container"><%= flashSuccess[0] %></div></div>
+<% } %>
+<% if (flashError && flashError.length) { %>
+  <div class="flash flash-error"><div class="container"><%= flashError[0] %></div></div>
+<% } %>

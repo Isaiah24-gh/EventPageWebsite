@@ -1,0 +1,56 @@
+<%- include('partials/header', { title, pageCss }) %>
+
+<section class="section">
+  <div class="container" style="max-width:640px;">
+    <p class="eyebrow">Feature 6 · Ticketing</p>
+    <h1>Get your tickets</h1>
+    <p style="color:var(--ink-soft);margin-bottom:28px;">We never process payments directly — you'll complete your purchase securely on the organiser's official ticketing platform.</p>
+
+    <% if (!event) { %>
+      <div class="empty-state">
+        <h3>No event selected</h3>
+        <p>Head back and choose an event to get tickets for. <a href="/">Browse Events</a></p>
+      </div>
+    <% } else { %>
+      <% const priceLabel = event.price > 0 ? `$${Number(event.price).toFixed(2)}` : 'Free'; %>
+
+      <div class="ticket-summary">
+        <div class="ticket-summary-top">
+          <span class="event-card-tag"><%= event.category %></span>
+          <h2 style="margin:8px 0 4px 0;"><%= event.title %></h2>
+          <p style="color:var(--ink-soft);margin:0;">
+            <%= new Date(event.event_date).toLocaleDateString('en-SG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }) %>
+            · <%= event.event_time.slice(0,5) %> · <%= event.venue %>
+          </p>
+        </div>
+        <div class="ticket-summary-divider"></div>
+        <div class="ticket-summary-bottom">
+          <div>
+            <div class="ticket-row"><span>Quantity</span><span id="qty-display">1 ticket</span></div>
+            <div class="ticket-row"><span>Price per ticket</span><span><%= priceLabel %></span></div>
+          </div>
+          <div style="text-align:right;">
+            <p style="font-family:var(--font-label);font-size:0.78rem;color:var(--ink-soft);margin:0;">Total</p>
+            <p id="total-display" style="font-family:var(--font-display);font-size:1.4rem;margin:0;" data-price="<%= event.price %>"><%= priceLabel %></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="field" style="max-width:200px;">
+        <label for="qty-input">Number of tickets</label>
+        <input type="number" id="qty-input" min="1" max="10" value="1">
+      </div>
+
+      <a class="btn btn-accent btn-block" href="<%= event.external_url %>" target="_blank" rel="noopener noreferrer">
+        Continue to Secure Checkout →
+      </a>
+
+      <div class="security-note" style="margin-top:16px;">
+        <span>🔒</span>
+        <span>You'll be redirected to <strong><%= hostname %></strong>, the organiser's official ticketing page, to complete payment securely. EventHub does not store your payment details.</span>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

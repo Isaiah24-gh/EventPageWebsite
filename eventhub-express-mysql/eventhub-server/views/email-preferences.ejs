@@ -1,0 +1,68 @@
+<%- include('partials/header', { title, pageCss, active }) %>
+
+<section class="section">
+  <div class="container" style="max-width:600px;">
+    <p class="eyebrow">Feature 4 · Email System</p>
+    <h1>Email updates</h1>
+    <p style="color:var(--ink-soft);margin-bottom:32px;">Get new events and reminders sent straight to your inbox. You can change these settings any time.</p>
+
+    <form id="email-form" class="card" method="POST" action="/email-preferences">
+
+      <div class="toggle-row">
+        <div>
+          <h3 style="margin-bottom:2px;">Weekly event digest</h3>
+          <p class="field-hint" style="margin:0;">A roundup of new local events near you, every Monday.</p>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="subscribe-toggle" name="subscribed" <%= prefs.subscribed ? 'checked' : '' %>>
+          <span class="switch-track"></span>
+        </label>
+      </div>
+
+      <div id="category-block" style="display:<%= prefs.subscribed ? 'block' : 'none' %>;">
+        <div class="field">
+          <label>Categories you're interested in</label>
+          <div class="checkbox-grid">
+            <% categories.forEach(cat => { %>
+              <label><input type="checkbox" name="categories" value="<%= cat %>" <%= selectedCategories.includes(cat) ? 'checked' : '' %>> <%= cat %></label>
+            <% }) %>
+          </div>
+        </div>
+      </div>
+
+      <div class="toggle-row">
+        <div>
+          <h3 style="margin-bottom:2px;">Event reminder emails</h3>
+          <p class="field-hint" style="margin:0;">Email me the day before events I've saved or asked to be reminded about.</p>
+        </div>
+        <label class="switch">
+          <input type="checkbox" name="reminders" <%= prefs.reminders_enabled ? 'checked' : '' %>>
+          <span class="switch-track"></span>
+        </label>
+      </div>
+
+      <div class="field" style="margin-top:20px;">
+        <label for="contactEmail">Email address</label>
+        <input type="email" id="contactEmail" name="contactEmail" value="<%= prefs.contact_email %>" required>
+      </div>
+
+      <button type="submit" class="btn btn-block">Save Preferences</button>
+    </form>
+
+    <div class="card" style="margin-top:24px;">
+      <p class="eyebrow">Preview</p>
+      <h3 style="margin-bottom:8px;">Sample digest email</h3>
+      <div class="email-preview">
+        <p style="font-family:var(--font-label);font-weight:700;">EventHub Weekly Digest</p>
+        <p style="color:var(--ink-soft);font-size:0.85rem;"><%= sampleEvents.length %> new events match your interests this week:</p>
+        <ul style="padding-left:18px;font-size:0.9rem;">
+          <% sampleEvents.forEach(e => { %>
+            <li><%= e.title %> — <%= new Date(e.event_date).toLocaleDateString('en-SG', { day: 'numeric', month: 'short', timeZone: 'UTC' }) %></li>
+          <% }) %>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

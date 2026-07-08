@@ -1,0 +1,99 @@
+<%- include('partials/header', { title, pageCss }) %>
+
+<section class="section">
+  <div class="container" style="max-width:760px;">
+    <span class="event-card-tag"><%= event.category %></span>
+    <h1><%= event.title %></h1>
+    <p style="color:var(--ink-soft);">
+      <%= new Date(event.event_date).toLocaleDateString('en-SG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }) %>
+      · <%= event.event_time.slice(0,5) %> · <%= event.venue %>
+    </p>
+    <p><%= event.description %></p>
+    <p><strong>Organiser:</strong> <%= event.organiser_name %> &nbsp;·&nbsp;
+       <strong>Price:</strong> <%= event.price > 0 ? '$' + Number(event.price).toFixed(2) : 'Free' %></p>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin:24px 0;">
+      <a class="btn" href="<%= event.external_url %>" target="_blank" rel="noopener noreferrer">Visit Organiser Page</a>
+      <a class="btn btn-accent" href="/ticketing/<%= event.id %>">Get Tickets</a>
+
+      <% if (currentUser) { %>
+        <form action="/account/favourites/<%= event.id %>" method="POST" style="margin:0;">
+          <button type="submit" class="btn btn-secondary"><%= isFavourited ? '★ Saved' : '☆ Save Event' %></button>
+        </form>
+        <form action="/notifications/<%= event.id %>" method="POST" style="margin:0;">
+          <button type="submit" class="btn btn-secondary">🔔 Remind Me</button>
+        </form>
+      <% } else { %>
+        <a class="btn btn-secondary" href="/login">☆ Save Event</a>
+        <a class="btn btn-secondary" href="/login">🔔 Remind Me</a>
+      <% } %>
+
+      <details style="display:inline-block;">
+        <summary class="btn btn-secondary" style="cursor:pointer;list-style:none;">⚑ Report Event</summary>
+        <form action="/events/<%= event.id %>/report" method="POST" class="card" style="margin-top:10px;max-width:340px;">
+          <div class="field">
+            <label for="reason">Why are you reporting this event?</label>
+            <textarea name="reason" id="reason" rows="2" required placeholder="e.g. looks like a scam"></textarea>
+          </div>
+          <button type="submit" class="btn btn-sm">Submit Report</button>
+        </form>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;" id="reviews">
+  <div class="container" style="max-width:760px;">
+    <p class="eyebrow">Feature 3 · Reviews &amp; Comments</p>
+    <div class="section-title">
+      <h2>Attendee reviews</h2>
+      <span class="badge"><%= avgRating ? `★ ${avgRating} · ${reviews.length} review${reviews.length === 1 ? '' : 's'}` : 'No reviews yet' %></span>
+    </div>
+
+    <form id="review-form" class="card" method="POST" action="/events/<%= event.id %>/reviews" style="margin-bottom:28px;">
+      <div class="field">
+        <label for="rev-name">Your name</label>
+        <input type="text" id="rev-name" name="name" required value="<%= currentUser ? currentUser.name : '' %>">
+      </div>
+      <div class="field">
+        <label>Rating</label>
+        <input type="hidden" name="rating" id="rating-input" value="0">
+        <div class="star-input" id="star-input" role="radiogroup" aria-label="Rating">
+          <button type="button" class="star" data-value="1" aria-label="1 star">★</button>
+          <button type="button" class="star" data-value="2" aria-label="2 stars">★</button>
+          <button type="button" class="star" data-value="3" aria-label="3 stars">★</button>
+          <button type="button" class="star" data-value="4" aria-label="4 stars">★</button>
+          <button type="button" class="star" data-value="5" aria-label="5 stars">★</button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="rev-comment">Comment</label>
+        <textarea id="rev-comment" name="comment" rows="3" required placeholder="How was it? Would you recommend it?"></textarea>
+      </div>
+      <button type="submit" class="btn">Post Review</button>
+    </form>
+
+    <% if (reviews.length) { %>
+      <% reviews.forEach(r => { %>
+        <div class="review-item">
+          <div class="review-meta">
+            <span><%= r.name %></span>
+            <span class="review-date"><%= new Date(r.created_at).toLocaleDateString('en-SG', { day: 'numeric', month: 'short', year: 'numeric' }) %></span>
+          </div>
+          <div class="review-stars"><%= '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating) %></div>
+          <p style="margin:6px 0 4px 0;"><%= r.comment %></p>
+          <form action="/events/reviews/<%= r.id %>/report" method="POST" style="margin:0;">
+            <button type="submit" class="btn btn-secondary btn-sm">⚑ Report</button>
+          </form>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <div class="empty-state">
+        <h3>Be the first to review</h3>
+        <p>Share your experience to help others decide whether to attend.</p>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

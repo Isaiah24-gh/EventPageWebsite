@@ -1,0 +1,8 @@
+<p class="eyebrow">Feature 7 · Admin Portal</p>
+<h1 style="margin-bottom:20px;">Admin</h1>
+<div class="admin-tabs">
+  <a href="/admin" <%= adminTab === 'dashboard' ? 'aria-current="page"' : '' %>>Dashboard</a>
+  <a href="/admin/events" <%= adminTab === 'events' ? 'aria-current="page"' : '' %>>Events</a>
+  <a href="/admin/users" <%= adminTab === 'users' ? 'aria-current="page"' : '' %>>Accounts</a>
+  <a href="/admin/reports" <%= adminTab === 'reports' ? 'aria-current="page"' : '' %>>Reports</a>
+</div>

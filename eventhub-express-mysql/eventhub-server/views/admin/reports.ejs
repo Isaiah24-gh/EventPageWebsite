@@ -1,0 +1,49 @@
+<%- include('../partials/header', { title, active }) %>
+
+<section class="section">
+  <div class="container">
+    <%- include('../partials/admin-tabs', { adminTab }) %>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr><th>Type</th><th>Target</th><th>Reason</th><th>Reported by</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          <% reports.forEach(r => { %>
+            <tr>
+              <td><span class="badge"><%= r.target_type %></span></td>
+              <td>
+                <% if (r.target_type === 'event') { %>
+                  <a href="/events/<%= r.target_id %>" target="_blank">Event #<%= r.target_id %></a>
+                <% } else if (r.target_type === 'user') { %>
+                  User #<%= r.target_id %> — <a href="/admin/users">manage accounts</a>
+                <% } else { %>
+                  Review #<%= r.target_id %>
+                <% } %>
+              </td>
+              <td><%= r.reason %></td>
+              <td><%= r.reported_by || 'Anonymous' %></td>
+              <td><span class="status-pill status-<%= r.status %>"><%= r.status %></span></td>
+              <td style="white-space:nowrap;">
+                <% if (r.status === 'open') { %>
+                  <form class="inline-form" action="/admin/reports/<%= r.id %>/resolve" method="POST">
+                    <button type="submit" class="btn btn-sm">Resolve</button>
+                  </form>
+                  <form class="inline-form" action="/admin/reports/<%= r.id %>/dismiss" method="POST">
+                    <button type="submit" class="btn btn-secondary btn-sm">Dismiss</button>
+                  </form>
+                <% } %>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <% if (!reports.length) { %>
+      <div class="empty-state"><h3>No reports</h3><p>Reports submitted from event pages and reviews will appear here.</p></div>
+    <% } %>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>

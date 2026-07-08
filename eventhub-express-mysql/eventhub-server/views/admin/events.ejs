@@ -1,0 +1,50 @@
+<%- include('../partials/header', { title, active }) %>
+
+<section class="section">
+  <div class="container">
+    <%- include('../partials/admin-tabs', { adminTab }) %>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr><th>Event</th><th>Organiser</th><th>Date</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          <% events.forEach(evt => { %>
+            <tr>
+              <td><a href="/events/<%= evt.id %>" target="_blank"><%= evt.title %></a><br><span class="field-hint"><%= evt.category %></span></td>
+              <td><%= evt.organiser_name %></td>
+              <td><%= new Date(evt.event_date).toLocaleDateString('en-SG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }) %></td>
+              <td><span class="status-pill status-<%= evt.status %>"><%= evt.status %></span></td>
+              <td style="white-space:nowrap;">
+                <% if (evt.status !== 'active') { %>
+                  <form class="inline-form" action="/admin/events/<%= evt.id %>/status" method="POST">
+                    <input type="hidden" name="status" value="active">
+                    <button type="submit" class="btn btn-sm">Approve</button>
+                  </form>
+                <% } %>
+                <% if (evt.status !== 'flagged') { %>
+                  <form class="inline-form" action="/admin/events/<%= evt.id %>/status" method="POST">
+                    <input type="hidden" name="status" value="flagged">
+                    <button type="submit" class="btn btn-secondary btn-sm">Flag</button>
+                  </form>
+                <% } %>
+                <% if (evt.status !== 'removed') { %>
+                  <form class="inline-form" action="/admin/events/<%= evt.id %>/status" method="POST" onsubmit="return confirm('Remove this event listing?');">
+                    <input type="hidden" name="status" value="removed">
+                    <button type="submit" class="btn btn-secondary btn-sm">Remove</button>
+                  </form>
+                <% } %>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <% if (!events.length) { %>
+      <div class="empty-state"><h3>No events yet</h3></div>
+    <% } %>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,51 @@
+<%- include('partials/header', { title, pageCss, active }) %>
+
+<section class="section">
+  <div class="container">
+    <p class="eyebrow">Feature 5 · Notifications</p>
+    <h1>Event reminders</h1>
+    <p style="color:var(--ink-soft);max-width:520px;margin-bottom:8px;">Add events to your reminder list and download a calendar invite so you never miss one.</p>
+
+    <div class="card" id="permission-card" style="margin:24px 0;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+      <div>
+        <h3 style="margin-bottom:2px;">Browser notifications</h3>
+        <p class="field-hint" id="permission-status" style="margin:0;">Not enabled</p>
+      </div>
+      <button class="btn btn-sm" id="enable-notif-btn">Enable Notifications</button>
+    </div>
+
+    <div class="section-title">
+      <h2>Your reminders</h2>
+      <span class="badge"><%= reminders.length %> reminder<%= reminders.length === 1 ? '' : 's' %></span>
+    </div>
+
+    <% if (reminders.length) { %>
+      <div class="event-grid">
+        <% reminders.forEach(evt => { %>
+          <div class="reminder-card">
+            <span class="event-card-tag"><%= evt.category %></span>
+            <h3 class="event-card-title"><%= evt.title %></h3>
+            <p class="event-card-meta">
+              <%= new Date(evt.event_date).toLocaleDateString('en-SG', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }) %>
+              · <%= evt.event_time.slice(0,5) %> · <%= evt.venue %>
+            </p>
+            <div class="reminder-card-actions">
+              <a class="btn btn-sm" href="/notifications/<%= evt.id %>/ics">Add to Calendar</a>
+              <form action="/notifications/<%= evt.id %>/remove" method="POST" style="margin:0;">
+                <button type="submit" class="btn btn-secondary btn-sm">Remove</button>
+              </form>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <div class="empty-state">
+        <h3>No reminders set</h3>
+        <p>Browse events and tap "Remind Me" to add one here.</p>
+        <a class="btn btn-sm" href="/" style="margin-top:12px;">Browse Events</a>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

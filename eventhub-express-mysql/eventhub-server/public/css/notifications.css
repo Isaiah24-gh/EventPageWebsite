@@ -1,0 +1,21 @@
+/* ==========================================================================
+   Feature 5: Notifications — page-specific styles
+   OWNERSHIP: [teammate name]
+   ========================================================================== */
+
+.reminder-card {
+  background: var(--white);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reminder-card-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: auto;
+}

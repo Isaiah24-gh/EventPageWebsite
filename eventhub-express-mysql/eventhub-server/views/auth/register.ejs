@@ -1,0 +1,52 @@
+<%- include('../partials/header', { title, pageCss }) %>
+
+<section class="section">
+  <div class="container">
+    <p class="eyebrow">Feature 1 · Account Creation</p>
+    <h1>Create your account</h1>
+    <p style="max-width:480px;color:var(--ink-soft);margin-bottom:32px;">Sign up as a visitor to save your favourite events, or as an organiser to publish listings.</p>
+
+    <div class="role-toggle" role="tablist" aria-label="Account type">
+      <button type="button" class="role-btn is-active" data-role="visitor" role="tab" aria-selected="true">I'm a Visitor</button>
+      <button type="button" class="role-btn" data-role="organiser" role="tab" aria-selected="false">I'm an Organiser</button>
+    </div>
+
+    <form id="register-form" class="form-card" method="POST" action="/register" novalidate>
+      <input type="hidden" name="role" id="role-input" value="visitor">
+
+      <div class="field">
+        <label for="fullName">Full name</label>
+        <input type="text" id="fullName" name="fullName" required autocomplete="name">
+      </div>
+
+      <div class="field" id="org-name-field" hidden>
+        <label for="orgName">Organisation / business name</label>
+        <input type="text" id="orgName" name="orgName" autocomplete="organization">
+      </div>
+
+      <div class="field">
+        <label for="email">Email address</label>
+        <input type="email" id="email" name="email" required autocomplete="email">
+        <p class="field-hint" id="email-hint">We'll send a confirmation link to this address.</p>
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required minlength="8" autocomplete="new-password">
+        <p class="field-hint">At least 8 characters.</p>
+      </div>
+
+      <div class="field">
+        <label for="confirmPassword">Confirm password</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" required autocomplete="new-password">
+      </div>
+
+      <button type="submit" class="btn btn-block" id="submit-btn">Create Visitor Account</button>
+      <p style="text-align:center;font-size:0.85rem;color:var(--ink-soft);margin:16px 0 0 0;">
+        Already have an account? <a href="/login" style="color:var(--ink);font-weight:600;">Log in</a>
+      </p>
+    </form>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>

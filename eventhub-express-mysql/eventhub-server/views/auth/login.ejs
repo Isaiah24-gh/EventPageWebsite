@@ -1,0 +1,33 @@
+<%- include('../partials/header', { title, pageCss }) %>
+
+<section class="section">
+  <div class="container">
+    <p class="eyebrow">Feature 1 · Account Creation</p>
+    <h1>Log in</h1>
+    <p style="max-width:480px;color:var(--ink-soft);margin-bottom:32px;">Welcome back — log in to manage your events and favourites.</p>
+
+    <form class="form-card" method="POST" action="/login">
+      <div class="field">
+        <label for="email">Email address</label>
+        <input type="email" id="email" name="email" required autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn btn-block">Log In</button>
+      <p style="text-align:center;font-size:0.85rem;color:var(--ink-soft);margin:16px 0 0 0;">
+        New here? <a href="/register" style="color:var(--ink);font-weight:600;">Create an account</a>
+      </p>
+    </form>
+
+    <div class="empty-state" style="margin-top:24px;max-width:460px;">
+      <p style="margin:0;font-size:0.82rem;"><strong>Demo accounts</strong> (after running <code>npm run seed</code>):<br>
+      Admin: admin@eventhub.local / admin123<br>
+      Organiser: contact@rpanimesoc.edu.sg / password123<br>
+      Visitor: jamie.tan@example.com / password123</p>
+    </div>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>

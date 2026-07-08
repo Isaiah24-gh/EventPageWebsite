@@ -1,0 +1,46 @@
+<%- include('../partials/header', { title, active }) %>
+
+<section class="section">
+  <div class="container">
+    <%- include('../partials/admin-tabs', { adminTab }) %>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr><th>Name</th><th>Email</th><th>Role</th><th>Listings</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          <% users.forEach(u => { %>
+            <tr>
+              <td><%= u.name %><% if (u.org_name) { %><br><span class="field-hint"><%= u.org_name %></span><% } %></td>
+              <td><%= u.email %></td>
+              <td><span class="badge<%= u.role === 'admin' ? ' badge-marigold' : '' %>"><%= u.role %></span></td>
+              <td><%= u.event_count %></td>
+              <td><span class="status-pill status-<%= u.status %>"><%= u.status %></span></td>
+              <td style="white-space:nowrap;">
+                <% if (u.id === currentUser.id) { %>
+                  <span class="field-hint">You</span>
+                <% } else if (u.status === 'active') { %>
+                  <form class="inline-form" action="/admin/users/<%= u.id %>/status" method="POST" onsubmit="return confirm('Suspend this account?');">
+                    <input type="hidden" name="status" value="suspended">
+                    <button type="submit" class="btn btn-secondary btn-sm">Suspend</button>
+                  </form>
+                <% } else { %>
+                  <form class="inline-form" action="/admin/users/<%= u.id %>/status" method="POST">
+                    <input type="hidden" name="status" value="active">
+                    <button type="submit" class="btn btn-sm">Reactivate</button>
+                  </form>
+                <% } %>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <% if (!users.length) { %>
+      <div class="empty-state"><h3>No accounts yet</h3></div>
+    <% } %>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>
