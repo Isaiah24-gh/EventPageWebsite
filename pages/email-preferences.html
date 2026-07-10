@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Email Preferences — EventHub</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/email.css">
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav">
+    <a class="brand" href="../index.html"><span class="brand-mark"></span>EventHub</a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Browse</a></li>
+      <li><a href="notifications.html">Reminders</a></li>
+      <li><a href="email-preferences.html" aria-current="page">Email Updates</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a class="btn btn-sm" href="account.html">My Account</a>
+    </div>
+  </nav>
+</header>
+
+<section class="section">
+  <div class="container" style="max-width:600px;">
+    <p class="eyebrow">Feature 4 · Email System</p>
+    <h1>Email updates</h1>
+    <p style="color:var(--ink-soft);margin-bottom:32px;">Get new events and reminders sent straight to your inbox. You can change these settings any time.</p>
+
+    <form id="email-form" class="card">
+
+      <div class="toggle-row">
+        <div>
+          <h3 style="margin-bottom:2px;">Weekly event digest</h3>
+          <p class="field-hint" style="margin:0;">A roundup of new local events near you, every Monday.</p>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="subscribe-toggle">
+          <span class="switch-track"></span>
+        </label>
+      </div>
+
+      <div id="category-block" style="display:none;">
+        <div class="field">
+          <label>Categories you're interested in</label>
+          <div class="checkbox-grid" id="category-checkboxes"></div>
+        </div>
+      </div>
+
+      <div class="toggle-row">
+        <div>
+          <h3 style="margin-bottom:2px;">Event reminder emails</h3>
+          <p class="field-hint" style="margin:0;">Email me the day before events I've saved or asked to be reminded about.</p>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="reminder-toggle" checked>
+          <span class="switch-track"></span>
+        </label>
+      </div>
+
+      <div class="field" style="margin-top:20px;">
+        <label for="email-address">Email address</label>
+        <input type="email" id="email-address" placeholder="you@example.com" required>
+      </div>
+
+      <button type="submit" class="btn btn-block">Save Preferences</button>
+    </form>
+
+    <div class="card" style="margin-top:24px;" id="preview-card">
+      <p class="eyebrow">Preview</p>
+      <h3 style="margin-bottom:8px;">Sample digest email</h3>
+      <div class="email-preview">
+        <p style="font-family:var(--font-label);font-weight:700;">EventHub Weekly Digest</p>
+        <p style="color:var(--ink-soft);font-size:0.85rem;">3 new events match your interests this week:</p>
+        <ul id="preview-events" style="padding-left:18px;font-size:0.9rem;"></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <span>EventHub — a LaunchLab student project.</span>
+    <span>Feature owner: [teammate name]</span>
+  </div>
+</footer>
+
+<script src="../js/main.js"></script>
+<script src="../js/email.js"></script>
+
+</body>
+</html>

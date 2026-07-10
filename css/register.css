@@ -1,0 +1,29 @@
+/* ==========================================================================
+   Feature 1: Account Creation — page-specific styles
+   OWNERSHIP: [teammate name]
+   ========================================================================== */
+
+.role-toggle {
+  display: inline-flex;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 28px;
+}
+
+.role-btn {
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: 0.88rem;
+  padding: 10px 20px;
+  border: none;
+  background: var(--white);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.role-btn + .role-btn { border-left: 2px solid var(--ink); }
+
+.role-btn.is-active {
+  background: var(--marigold);
+}

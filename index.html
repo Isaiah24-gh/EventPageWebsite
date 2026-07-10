@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EventHub — Discover Local Events</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav">
+    <a class="brand" href="index.html"><span class="brand-mark"></span>EventHub</a>
+    <ul class="nav-links">
+      <li><a href="index.html" aria-current="page">Browse</a></li>
+      <li><a href="pages/notifications.html">Reminders</a></li>
+      <li><a href="pages/email-preferences.html">Email Updates</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a class="btn btn-secondary btn-sm" href="pages/register.html">Sign Up</a>
+      <a class="btn btn-sm" href="pages/account.html">My Account</a>
+    </div>
+  </nav>
+</header>
+
+<section class="page-hero">
+  <div class="container">
+    <p class="eyebrow">Student Activities · Fandom Meets · Flea &amp; Warehouse Sales</p>
+    <h1>Find what's happening<br>near you, this week.</h1>
+    <p style="max-width:520px;color:var(--ink-soft)">Browse pop-ups, hobby gatherings, and campus events in one place — then head straight to the organiser to register.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+
+    <form id="filter-form" class="card" style="margin-bottom:32px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;align-items:end;">
+      <div class="field" style="margin-bottom:0;">
+        <label for="f-search">Search</label>
+        <input type="text" id="f-search" placeholder="Search events…">
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label for="f-category">Category</label>
+        <select id="f-category">
+          <option value="">All categories</option>
+        </select>
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label for="f-date">Date</label>
+        <input type="date" id="f-date">
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label for="f-price">Price</label>
+        <select id="f-price">
+          <option value="">Any price</option>
+          <option value="free">Free only</option>
+          <option value="paid">Paid only</option>
+        </select>
+      </div>
+    </form>
+
+    <div class="section-title">
+      <h2>Upcoming events</h2>
+      <span id="result-count" class="badge">0 events</span>
+    </div>
+
+    <div id="event-grid" class="event-grid"></div>
+    <div id="empty-state" class="empty-state" style="display:none;">
+      <h3>No events match your filters</h3>
+      <p>Try clearing a filter or searching a different keyword.</p>
+    </div>
+
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <span>EventHub — a LaunchLab student project.</span>
+    <span>Prototype build · not for production use</span>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+<script>
+  const grid = document.getElementById("event-grid");
+  const emptyState = document.getElementById("empty-state");
+  const resultCount = document.getElementById("result-count");
+  const searchInput = document.getElementById("f-search");
+  const categorySelect = document.getElementById("f-category");
+  const dateInput = document.getElementById("f-date");
+  const priceSelect = document.getElementById("f-price");
+
+  const events = EventHub.getEvents();
+
+  // populate category filter dynamically
+  [...new Set(events.map(e => e.category))].sort().forEach(cat => {
+    const opt = document.createElement("option");
+    opt.value = cat;
+    opt.textContent = cat;
+    categorySelect.appendChild(opt);
+  });
+
+  function render() {
+    const search = searchInput.value.trim().toLowerCase();
+    const category = categorySelect.value;
+    const date = dateInput.value;
+    const price = priceSelect.value;
+
+    const filtered = events.filter(evt => {
+      if (search && !(evt.title.toLowerCase().includes(search) || evt.venue.toLowerCase().includes(search))) return false;
+      if (category && evt.category !== category) return false;
+      if (date && evt.date !== date) return false;
+      if (price === "free" && evt.price > 0) return false;
+      if (price === "paid" && evt.price === 0) return false;
+      return true;
+    }).sort((a, b) => a.date.localeCompare(b.date));
+
+    resultCount.textContent = `${filtered.length} event${filtered.length === 1 ? "" : "s"}`;
+    grid.innerHTML = filtered.map(evt => EventHub.eventCardHTML(evt, { href: `pages/event-detail.html?id=${evt.id}` })).join("");
+    emptyState.style.display = filtered.length ? "none" : "block";
+  }
+
+  [searchInput, categorySelect, dateInput, priceSelect].forEach(el => {
+    el.addEventListener("input", render);
+  });
+
+  render();
+</script>
+
+</body>
+</html>

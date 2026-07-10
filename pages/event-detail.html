@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Event Details — EventHub</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/reviews.css">
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav">
+    <a class="brand" href="../index.html"><span class="brand-mark"></span>EventHub</a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Browse</a></li>
+      <li><a href="notifications.html">Reminders</a></li>
+      <li><a href="email-preferences.html">Email Updates</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a class="btn btn-sm" href="account.html">My Account</a>
+    </div>
+  </nav>
+</header>
+
+<section class="section">
+  <div class="container" id="event-container" style="max-width:760px;">
+    <!-- Event content injected by js/event-detail.js -->
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+  <div class="container" style="max-width:760px;">
+    <p class="eyebrow">Feature 3 · Reviews &amp; Comments</p>
+    <div class="section-title">
+      <h2>Attendee reviews</h2>
+      <span class="badge" id="review-summary">No reviews yet</span>
+    </div>
+
+    <form id="review-form" class="card" style="margin-bottom:28px;">
+      <div class="field">
+        <label for="rev-name">Your name</label>
+        <input type="text" id="rev-name" required>
+      </div>
+      <div class="field">
+        <label>Rating</label>
+        <div class="star-input" id="star-input" role="radiogroup" aria-label="Rating">
+          <button type="button" class="star" data-value="1" aria-label="1 star">★</button>
+          <button type="button" class="star" data-value="2" aria-label="2 stars">★</button>
+          <button type="button" class="star" data-value="3" aria-label="3 stars">★</button>
+          <button type="button" class="star" data-value="4" aria-label="4 stars">★</button>
+          <button type="button" class="star" data-value="5" aria-label="5 stars">★</button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="rev-comment">Comment</label>
+        <textarea id="rev-comment" rows="3" required placeholder="How was it? Would you recommend it?"></textarea>
+      </div>
+      <button type="submit" class="btn">Post Review</button>
+    </form>
+
+    <div id="review-list"></div>
+    <div id="review-empty" class="empty-state" style="display:none;">
+      <h3>Be the first to review</h3>
+      <p>Share your experience to help others decide whether to attend.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <span>EventHub — a LaunchLab student project.</span>
+    <span>Feature owner: [teammate name]</span>
+  </div>
+</footer>
+
+<script src="../js/main.js"></script>
+<script src="../js/event-detail.js"></script>
+<script src="../js/reviews.js"></script>
+
+</body>
+</html>

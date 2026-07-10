@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Account — EventHub</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/account.css">
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav">
+    <a class="brand" href="../index.html"><span class="brand-mark"></span>EventHub</a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Browse</a></li>
+      <li><a href="notifications.html">Reminders</a></li>
+      <li><a href="email-preferences.html">Email Updates</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="btn btn-secondary btn-sm" id="logout-btn">Log Out</button>
+    </div>
+  </nav>
+</header>
+
+<section class="section">
+  <div class="container">
+
+    <div id="signed-out-view" style="display:none;">
+      <p class="eyebrow">Feature 2 · Account Webpage</p>
+      <h1>You're not signed in</h1>
+      <p style="color:var(--ink-soft);max-width:440px;">Create an account to save favourite events and manage your listings.</p>
+      <a class="btn" href="register.html">Sign Up</a>
+    </div>
+
+    <div id="signed-in-view" style="display:none;">
+      <p class="eyebrow">Feature 2 · Account Webpage</p>
+      <div class="profile-header">
+        <div class="avatar" id="avatar-initials">?</div>
+        <div>
+          <h1 id="user-name" style="margin-bottom:2px;">—</h1>
+          <p style="color:var(--ink-soft);margin:0;" id="user-email">—</p>
+          <span class="badge" id="user-role-badge" style="margin-top:6px;">visitor</span>
+        </div>
+      </div>
+
+      <div class="section-title">
+        <h2>Saved favourites</h2>
+      </div>
+      <div id="favourites-grid" class="event-grid"></div>
+      <div id="favourites-empty" class="empty-state" style="display:none;">
+        <h3>No saved events yet</h3>
+        <p>Browse events and tap "Save" to add them here.</p>
+        <a class="btn btn-sm" href="../index.html" style="margin-top:12px;">Browse Events</a>
+      </div>
+
+      <div id="organiser-section" style="display:none;margin-top:48px;">
+        <div class="section-title">
+          <h2>My listings</h2>
+          <button class="btn btn-sm" id="new-listing-btn">+ New Listing</button>
+        </div>
+
+        <form id="listing-form" class="form-card" style="max-width:100%;display:none;margin-bottom:24px;">
+          <div class="field"><label for="l-title">Event title</label><input type="text" id="l-title" required></div>
+          <div class="field"><label for="l-category">Category</label><input type="text" id="l-category" placeholder="e.g. Flea Market" required></div>
+          <div class="field"><label for="l-date">Date</label><input type="date" id="l-date" required></div>
+          <div class="field"><label for="l-time">Time</label><input type="time" id="l-time" required></div>
+          <div class="field"><label for="l-venue">Venue</label><input type="text" id="l-venue" required></div>
+          <div class="field"><label for="l-desc">Short description</label><textarea id="l-desc" rows="3" required></textarea></div>
+          <div class="field"><label for="l-url">Registration link (your website / social page)</label><input type="url" id="l-url" placeholder="https://" required></div>
+          <button type="submit" class="btn btn-block">Publish Listing</button>
+        </form>
+
+        <div id="listings-grid" class="event-grid"></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <span>EventHub — a LaunchLab student project.</span>
+    <span>Feature owner: [teammate name]</span>
+  </div>
+</footer>
+
+<script src="../js/main.js"></script>
+<script src="../js/account.js"></script>
+
+</body>
+</html>

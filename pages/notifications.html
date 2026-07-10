@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reminders — EventHub</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/notifications.css">
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav">
+    <a class="brand" href="../index.html"><span class="brand-mark"></span>EventHub</a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Browse</a></li>
+      <li><a href="notifications.html" aria-current="page">Reminders</a></li>
+      <li><a href="email-preferences.html">Email Updates</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a class="btn btn-sm" href="account.html">My Account</a>
+    </div>
+  </nav>
+</header>
+
+<section class="section">
+  <div class="container">
+    <p class="eyebrow">Feature 5 · Notifications</p>
+    <h1>Event reminders</h1>
+    <p style="color:var(--ink-soft);max-width:520px;margin-bottom:8px;">Add events to your reminder list and download a calendar invite so you never miss one.</p>
+
+    <div class="card" id="permission-card" style="margin:24px 0;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+      <div>
+        <h3 style="margin-bottom:2px;">Browser notifications</h3>
+        <p class="field-hint" id="permission-status" style="margin:0;">Not enabled</p>
+      </div>
+      <button class="btn btn-sm" id="enable-notif-btn">Enable Notifications</button>
+    </div>
+
+    <div class="section-title">
+      <h2>Your reminders</h2>
+      <span class="badge" id="reminder-count">0 reminders</span>
+    </div>
+
+    <div id="reminder-list" class="event-grid"></div>
+    <div id="reminder-empty" class="empty-state" style="display:none;">
+      <h3>No reminders set</h3>
+      <p>Browse events and tap "Remind Me" to add one here.</p>
+      <a class="btn btn-sm" href="../index.html" style="margin-top:12px;">Browse Events</a>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <span>EventHub — a LaunchLab student project.</span>
+    <span>Feature owner: [teammate name]</span>
+  </div>
+</footer>
+
+<script src="../js/main.js"></script>
+<script src="../js/notifications.js"></script>
+
+</body>
+</html>
