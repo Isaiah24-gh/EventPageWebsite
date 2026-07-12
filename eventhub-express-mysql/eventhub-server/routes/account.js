@@ -7,10 +7,45 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../config/db");
 const { requireLogin } = require("../middleware/auth");
+const multer = require("multer");
+const path = require("path");
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, "public/uploads/avatars"),
+  filename: (req, file, cb) => cb(null, `user-${req.session.user.id}-${Date.now()}${path.extname(file.originalname)}`)
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB
+  fileFilter: (req, file, cb) => cb(null, /jpeg|jpg|png|webp/.test(file.mimetype))
+});
+
+router.post("/profile", requireLogin, upload.single("avatar"), async (req, res, next) => {
+  try {
+    const userId = req.session.user.id;
+    const { bio } = req.body;
+
+    if (req.file) {
+      const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+      await pool.query("UPDATE users SET bio = ?, avatar_url = ? WHERE id = ?", [bio, avatarUrl, userId]);
+    } else {
+      await pool.query("UPDATE users SET bio = ? WHERE id = ?", [bio, userId]);
+    }
+
+    req.flash("success", "Profile updated.");
+    res.redirect("/account");
+  } catch (err) {
+    next(err);
+  }
+});
 
 router.get("/", requireLogin, async (req, res, next) => {
   try {
     const user = req.session.user;
+
+    const [userRows] = await pool.query("SELECT * FROM users WHERE id = ?", [user.id]);
+    const profileUser = userRows[0];
 
     const [favourites] = await pool.query(
       `SELECT e.* FROM favourites f
@@ -29,7 +64,7 @@ router.get("/", requireLogin, async (req, res, next) => {
       listings = rows;
     }
 
-    res.render("account", { title: "My Account", pageCss: "account", pageJs: "account", favourites, listings });
+    res.render("account", { title: "My Account", pageCss: "account", pageJs: "account", favourites, listings, profileUser });
   } catch (err) {
     next(err);
   }
