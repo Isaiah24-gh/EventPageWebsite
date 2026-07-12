@@ -14,6 +14,8 @@ CREATE TABLE IF NOT EXISTS users (
   password_hash VARCHAR(255) NOT NULL,
   role          ENUM('visitor', 'organiser', 'admin') NOT NULL DEFAULT 'visitor',
   org_name      VARCHAR(160) NULL,
+  avatar_url    VARCHAR(255) NULL,
+  bio           VARCHAR(500) NULL,
   status        ENUM('active', 'suspended') NOT NULL DEFAULT 'active',
   created_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
