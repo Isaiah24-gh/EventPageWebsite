@@ -1,6 +1,6 @@
 /* ==========================================================================
    Feature 4: Email System
-   OWNERSHIP: [teammate name]
+   OWNERSHIP: Yong Ting
    ========================================================================== */
 
 const express = require("express");

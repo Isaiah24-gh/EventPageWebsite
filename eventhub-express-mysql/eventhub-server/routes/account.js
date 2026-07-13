@@ -1,6 +1,6 @@
 /* ==========================================================================
    Feature 2: Account Webpage
-   OWNERSHIP: [teammate name]
+   OWNERSHIP: Isaiah
    ========================================================================== */
 
 const express = require("express");
@@ -24,13 +24,14 @@ const upload = multer({
 router.post("/profile", requireLogin, upload.single("avatar"), async (req, res, next) => {
   try {
     const userId = req.session.user.id;
-    const { bio } = req.body;
+    const { bio, gender } = req.body;
+    const genderValue = ["male", "female"].includes(gender) ? gender : null;
 
     if (req.file) {
       const avatarUrl = `/uploads/avatars/${req.file.filename}`;
-      await pool.query("UPDATE users SET bio = ?, avatar_url = ? WHERE id = ?", [bio, avatarUrl, userId]);
+      await pool.query("UPDATE users SET bio = ?, gender = ?, avatar_url = ? WHERE id = ?", [bio, genderValue, avatarUrl, userId]);
     } else {
-      await pool.query("UPDATE users SET bio = ? WHERE id = ?", [bio, userId]);
+      await pool.query("UPDATE users SET bio = ?, gender = ? WHERE id = ?", [bio, genderValue, userId]);
     }
 
     req.flash("success", "Profile updated.");
