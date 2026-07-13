@@ -1,6 +1,6 @@
 /* ==========================================================================
    Feature 6: Ticketing
-   OWNERSHIP: [teammate name]
+   OWNERSHIP: Hnin
    Does not process payments. Confirms an order summary, then hands off to
    the organiser's external, secure ticketing link (event.external_url).
    ========================================================================== */

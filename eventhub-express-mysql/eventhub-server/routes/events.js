@@ -1,6 +1,6 @@
 /* ==========================================================================
    Feature 3: Event Detail, Reviews & Comments
-   OWNERSHIP: [teammate name]
+   OWNERSHIP: Cheeks
    ========================================================================== */
 
 const express = require("express");

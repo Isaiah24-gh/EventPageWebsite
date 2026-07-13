@@ -1,6 +1,6 @@
 /* ==========================================================================
    Feature 7: Admin Portal
-   OWNERSHIP: [teammate name]
+   OWNERSHIP: Brian
    Gives admins master control over the site: flag/remove suspicious event
    listings, suspend spam accounts, and work through a reports queue fed by
    the "Report" buttons on events and reviews (see routes/events.js).

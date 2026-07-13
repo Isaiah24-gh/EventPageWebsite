@@ -1,6 +1,6 @@
 /* ==========================================================================
    Feature 5: Notifications (Calendar Reminders)
-   OWNERSHIP: [teammate name]
+   OWNERSHIP: Haziq
    ========================================================================== */
 
 const express = require("express");
