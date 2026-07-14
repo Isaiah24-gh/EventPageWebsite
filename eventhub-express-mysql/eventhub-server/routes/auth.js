@@ -7,6 +7,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const pool = require("../config/db");
+const { sendWelcomeEmail } = require("../config/mail");
 
 const FREE_EMAIL_PROVIDERS = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "icloud.com"];
 
@@ -47,6 +48,11 @@ router.post("/register", async (req, res, next) => {
       `INSERT INTO users (name, email, password_hash, role, org_name, gender, status) VALUES (?, ?, ?, ?, ?, ?, 'active')`,
       [fullName, email, passwordHash, role, role === "organiser" ? orgName : null, gender || null]
     );
+    try {
+      await sendWelcomeEmail(email, fullName);
+} catch (err) {
+    console.error("Failed to send welcome email:", err);
+}
 
     req.session.user = { id: result.insertId, name: fullName, email, role, orgName: orgName || null };
     req.flash("success", "Account created! Welcome to EventHub.");
