@@ -4,14 +4,59 @@
   <div class="container">
     <p class="eyebrow">Feature 2 · Account Webpage</p>
 
-    <div class="profile-header">
-      <div class="avatar"><%= currentUser.name.charAt(0).toUpperCase() %></div>
-      <div>
-        <h1 style="margin-bottom:2px;"><%= currentUser.name %></h1>
-        <p style="color:var(--ink-soft);margin:0;"><%= currentUser.email %></p>
-        <span class="badge" style="margin-top:6px;"><%= currentUser.role %></span>
+<div class="profile-header">
+  <label class="avatar avatar-upload" for="avatar-input">
+    <% if (profileUser.avatar_url) { %>
+      <img src="<%= profileUser.avatar_url %>" alt="Profile picture">
+    <% } else { %>
+      <%= profileUser.name.charAt(0).toUpperCase() %>
+    <% } %>
+    <span class="avatar-edit-badge">Change</span>
+  </label>
+
+  <div>
+    <h1 style="margin-bottom:2px;"><%= profileUser.name %></h1>
+    <p style="color:var(--ink-soft);margin:0;"><%= profileUser.email %></p>
+    <div style="display:flex;gap:6px;margin-top:6px;">
+      <span class="badge"><%= profileUser.role %></span>
+      <% if (profileUser.gender) { %>
+        <span class="badge badge-marigold"><%= profileUser.gender %></span>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<form id="profile-form" class="form-card" method="POST" action="/account/profile" enctype="multipart/form-data" style="max-width:480px;margin-bottom:40px;">
+  <input type="file" id="avatar-input" name="avatar" accept="image/png,image/jpeg,image/webp" form="profile-form" hidden>
+
+  <div class="field">
+    <label for="gender">Preferred gender</label>
+    <select id="gender" name="gender">
+      <option value="" <%= !profileUser.gender ? 'selected' : '' %>>Prefer not to say</option>
+      <option value="male" <%= profileUser.gender === 'male' ? 'selected' : '' %>>Male</option>
+      <option value="female" <%= profileUser.gender === 'female' ? 'selected' : '' %>>Female</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <div class="bio-label-row">
+      <label for="bio">Bio</label>
+      <button type="button" id="edit-bio-btn" class="btn-link">Edit</button>
+    </div>
+
+    <p id="bio-display" class="bio-display"><%= profileUser.bio || 'No bio yet. Click edit to add one.' %></p>
+
+    <div id="bio-edit-wrap" class="bio-edit-wrap" hidden>
+      <textarea id="bio" name="bio" rows="3" maxlength="500" placeholder="Tell people a bit about yourself..."><%= profileUser.bio || '' %></textarea>
+      <div class="bio-edit-actions">
+        <button type="submit" class="btn btn-sm">Save</button>
+        <button type="button" id="cancel-bio-btn" class="btn btn-sm btn-secondary">Cancel</button>
       </div>
     </div>
+  </div>
+
+  <button type="submit" class="btn btn-block">Save Profile</button>
+</form>
 
     <div class="section-title">
       <h2>Saved favourites</h2>

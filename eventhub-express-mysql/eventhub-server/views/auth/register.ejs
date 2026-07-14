@@ -31,6 +31,16 @@
       </div>
 
       <div class="field">
+        <label for="gender">Preferred gender</label>
+        <select id="gender" name="gender" required>
+          <option value="" disabled selected>Select an option</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+        </select>
+        <p class="field-hint">Shown on your profile page.</p>
+      </div>
+
+      <div class="field">
         <label for="password">Password</label>
         <input type="password" id="password" name="password" required minlength="8" autocomplete="new-password">
         <p class="field-hint">At least 8 characters.</p>
