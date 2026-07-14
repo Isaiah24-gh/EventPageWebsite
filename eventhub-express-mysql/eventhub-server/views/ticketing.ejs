@@ -4,7 +4,7 @@
   <div class="container" style="max-width:640px;">
     <p class="eyebrow">Feature 6 · Ticketing</p>
     <h1>Get your tickets</h1>
-    <p style="color:var(--ink-soft);margin-bottom:28px;">We never process payments directly — you'll complete your purchase securely on the organiser's official ticketing platform.</p>
+    <p style="color:var(--ink-soft);margin-bottom:28px;">Complete your ticket purchase securely via our integrated payment API gateway.</p>
 
     <% if (!event) { %>
       <div class="empty-state">
@@ -36,19 +36,40 @@
         </div>
       </div>
 
-      <div class="field" style="max-width:200px;">
-        <label for="qty-input">Number of tickets</label>
-        <input type="number" id="qty-input" min="1" max="10" value="1">
-      </div>
+      <form id="payment-form" action="/ticketing/checkout" method="POST" style="margin-top: 24px;">
+        <input type="hidden" name="eventId" id="event-id-input" value="<%= event.id %>">
 
-      <a class="btn btn-accent btn-block" href="<%= event.external_url %>" target="_blank" rel="noopener noreferrer">
-        Continue to Secure Checkout →
-      </a>
+        <div class="field" style="max-width:200px; margin-bottom: 20px;">
+          <label for="qty-input">Number of tickets</label>
+          <input type="number" id="qty-input" name="quantity" min="1" max="10" value="1" required>
+        </div>
 
-      <div class="security-note" style="margin-top:16px;">
-        <span>🔒</span>
-        <span>You'll be redirected to <strong><%= hostname %></strong>, the organiser's official ticketing page, to complete payment securely. EventHub does not store your payment details.</span>
-      </div>
+        <!-- MOCK CREDIT CARD FORM FIELDS -->
+        <div class="payment-details" style="border: 1px solid var(--border-color, #ccc); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+          <h3 style="margin-top: 0; margin-bottom: 16px;">Card Information</h3>
+          
+          <div class="field" style="margin-bottom: 12px;">
+            <label for="card-number">Card Number</label>
+            <input type="text" id="card-number" placeholder="4111 2222 3333 4444" minlength="16" maxlength="19" required>
+          </div>
+
+          <div style="display: flex; gap: 16px;">
+            <div class="field" style="flex: 1;">
+              <label for="card-expiry">Expiry Date</label>
+              <input type="text" id="card-expiry" placeholder="MM/YY" maxlength="5" required>
+            </div>
+            <div class="field" style="flex: 1;">
+              <label for="card-cvv">CVV</label>
+              <input type="text" id="card-cvv" placeholder="123" minlength="3" maxlength="4" required>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" id="submit-btn" class="btn btn-accent btn-block">
+          Authorize & Pay Securely →
+        </button>
+      </form>
+
     <% } %>
   </div>
 </section>
