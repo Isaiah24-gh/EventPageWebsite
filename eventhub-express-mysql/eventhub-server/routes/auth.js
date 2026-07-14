@@ -1,6 +1,6 @@
 /* ==========================================================================
    Feature 1: Account Creation & Login
-   OWNERSHIP: [teammate name]
+   OWNERSHIP: Isaiah
    ========================================================================== */
 
 const express = require("express");
@@ -22,13 +22,16 @@ router.get("/register", (req, res) => {
 
 router.post("/register", async (req, res, next) => {
   try {
-    const { role, fullName, orgName, email, password, confirmPassword } = req.body;
+    const { role, fullName, orgName, email, password, confirmPassword, gender } = req.body;
     const errors = [];
 
     if (password !== confirmPassword) errors.push("Passwords do not match.");
     if (password.length < 8) errors.push("Password must be at least 8 characters.");
     if (role === "organiser" && !looksLikeOrgEmail(email)) {
       errors.push("Organisers must sign up with a verified organisation or business email address.");
+    }
+    if (gender && !["male", "female"].includes(gender)) {
+      errors.push("Please select a valid gender.");
     }
 
     const [existing] = await pool.query("SELECT id FROM users WHERE email = ?", [email]);
@@ -41,8 +44,8 @@ router.post("/register", async (req, res, next) => {
 
     const passwordHash = await bcrypt.hash(password, 10);
     const [result] = await pool.query(
-      `INSERT INTO users (name, email, password_hash, role, org_name, status) VALUES (?, ?, ?, ?, ?, 'active')`,
-      [fullName, email, passwordHash, role, role === "organiser" ? orgName : null]
+      `INSERT INTO users (name, email, password_hash, role, org_name, gender, status) VALUES (?, ?, ?, ?, ?, ?, 'active')`,
+      [fullName, email, passwordHash, role, role === "organiser" ? orgName : null, gender || null]
     );
 
     req.session.user = { id: result.insertId, name: fullName, email, role, orgName: orgName || null };
