@@ -68,6 +68,49 @@ table.data-table tr:last-child td { border-bottom: none; }
 
 .inline-form { display: inline; }
 
+.report-target {
+  position: relative;
+  display: inline-block;
+}
+
+.report-target .hover-label {
+  cursor: help;
+  text-decoration: underline dotted;
+}
+
+.report-target .review-preview {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  width: min(360px, 80vw);
+  margin-top: 10px;
+  padding: 12px 14px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition: opacity 180ms ease, transform 180ms ease, visibility 180ms;
+  z-index: 2;
+}
+
+.report-target:hover .review-preview,
+.report-target:focus-within .review-preview {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.report-target .review-preview p {
+  margin: 0 0 8px;
+  line-height: 1.4;
+  color: var(--ink);
+}
+
+.report-target .review-preview p:last-child { margin-bottom: 0; }
+
 .admin-tabs { display: flex; gap: 4px; border-bottom: 2px solid var(--ink); margin-bottom: 24px; flex-wrap: wrap; }
 
 .admin-tabs a {

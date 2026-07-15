@@ -120,7 +120,12 @@ router.post("/users/:id/status", async (req, res, next) => {
 // ---- Reports queue ----
 router.get("/reports", async (req, res, next) => {
   try {
-    const [reports] = await pool.query(`SELECT * FROM reports ORDER BY FIELD(status, 'open', 'resolved', 'dismissed'), created_at DESC`);
+    const [reports] = await pool.query(
+      `SELECT r.*, rev.name AS review_name, rev.rating AS review_rating, rev.comment AS review_comment
+       FROM reports r
+       LEFT JOIN reviews rev ON r.target_type = 'review' AND r.target_id = rev.id
+       ORDER BY FIELD(r.status, 'open', 'resolved', 'dismissed'), r.created_at DESC`
+    );
     res.render("admin/reports", { title: "Reports Queue", active: "admin", pageCss: 'admin', adminTab: "reports", reports });
   } catch (err) {
     next(err);
@@ -133,6 +138,32 @@ router.post("/reports/:id/:action(resolve|dismiss)", async (req, res, next) => {
     await pool.query("UPDATE reports SET status = ? WHERE id = ?", [status, req.params.id]);
     await logAction(req.session.user.id, `Marked report as ${status}`, "report", req.params.id);
     req.flash("success", `Report ${status}.`);
+    res.redirect("/admin/reports");
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post("/reports/:id/delete-review", async (req, res, next) => {
+  try {
+    const [reports] = await pool.query("SELECT * FROM reports WHERE id = ?", [req.params.id]);
+    const report = reports[0];
+    if (!report || report.target_type !== "review") {
+      req.flash("error", "Unable to delete that review.");
+      return res.redirect("/admin/reports");
+    }
+
+    const [reviews] = await pool.query("SELECT * FROM reviews WHERE id = ?", [report.target_id]);
+    if (!reviews.length) {
+      req.flash("error", "Review not found.");
+      return res.redirect("/admin/reports");
+    }
+
+    await pool.query("DELETE FROM reviews WHERE id = ?", [report.target_id]);
+    await pool.query("UPDATE reports SET status = 'resolved' WHERE id = ?", [req.params.id]);
+    await pool.query("UPDATE reports SET status = 'resolved' WHERE target_type = 'review' AND target_id = ?", [report.target_id]);
+    await logAction(req.session.user.id, `Deleted review and resolved report`, "review", report.target_id);
+    req.flash("success", "Review removed from the database and report resolved.");
     res.redirect("/admin/reports");
   } catch (err) {
     next(err);

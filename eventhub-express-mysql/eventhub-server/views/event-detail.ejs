@@ -53,7 +53,7 @@
     <form id="review-form" class="card" method="POST" action="/events/<%= event.id %>/reviews" style="margin-bottom:28px;">
       <div class="field">
         <label for="rev-name">Your name</label>
-        <input type="text" id="rev-name" name="name" required value="<%= currentUser ? currentUser.name : '' %>">
+        <input type="text" id="rev-name" name="name" required autocomplete="name" value="<%= currentUser ? currentUser.name : '' %>">
       </div>
       <div class="field">
         <label>Rating</label>
