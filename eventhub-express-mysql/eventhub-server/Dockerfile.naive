@@ -1,0 +1,31 @@
+# ==========================================================================
+# EventHub — "Tutorial-level" Dockerfile
+#
+# THIS IS NOT THE PRODUCTION IMAGE. Do not deploy this.
+#
+# It exists so you can measure your optimised image against a realistic
+# naive baseline and present concrete numbers (image size, CVE count) as
+# evidence of technical initiative.
+#
+# What is deliberately wrong with it:
+#   - Full Debian base image instead of Alpine
+#   - `COPY . .` before install, so ANY source edit busts the dependency cache
+#   - `npm install` instead of `npm ci` (not reproducible)
+#   - Installs devDependencies into a production image
+#   - Runs as root
+#   - No healthcheck
+#
+# Build:  docker build -f Dockerfile.naive -t eventhub:naive .
+# ==========================================================================
+
+FROM node:20
+
+WORKDIR /app
+
+COPY . .
+
+RUN npm install
+
+EXPOSE 3000
+
+CMD ["node", "server.js"]

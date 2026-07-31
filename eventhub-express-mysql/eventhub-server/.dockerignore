@@ -1,0 +1,46 @@
+# ==========================================================================
+# EventHub — Docker build context exclusions
+# OWNERSHIP: Member 2 (Dockerisation)
+#
+# Anything listed here is never sent to the Docker daemon, so it cannot end
+# up in the image. Two reasons this file matters:
+#   1. Speed  — node_modules is ~138 packages; shipping it makes builds crawl
+#   2. Safety — .env must NEVER be baked into an image layer
+# ==========================================================================
+
+# Dependencies — reinstalled inside the image by `npm ci`
+node_modules
+npm-debug.log*
+yarn-error.log*
+
+# Secrets — injected as environment variables at runtime, never baked in
+.env
+.env.*
+
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# CI / infrastructure config (not needed by the running app)
+.github
+ansible
+docker-compose*.yml
+Dockerfile*
+.dockerignore
+
+# Tests and coverage (run in CI, not shipped to production)
+tests
+__tests__
+*.test.js
+coverage
+jest.config.js
+
+# Editor / OS noise
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# Docs
+*.md
