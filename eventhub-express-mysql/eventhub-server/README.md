@@ -18,6 +18,7 @@ Create a MySQL database and apply the schema:
 ```
 mysql -u root -p -e "CREATE DATABASE eventhub"
 mysql -u root -p eventhub < database/schema.sql
+run the commands in migration_add_password_resets.sql. Its in the database folder. Run it in workbench
 ```
 
 ### 3. Configure environment variables
