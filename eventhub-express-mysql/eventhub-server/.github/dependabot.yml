@@ -1,0 +1,29 @@
+# ==========================================================================
+# Dependabot — automated dependency and base-image updates
+# OWNERSHIP: Member 3 (CI/CD)
+#
+# Every update arrives as a PR, which means it runs through the full CI
+# pipeline before anyone merges it. That is the point: patching becomes a
+# routine review instead of a scramble after a CVE lands.
+# ==========================================================================
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      # One PR for all patch bumps instead of fifteen.
+      patch-updates:
+        update-types: ["patch"]
+
+  - package-ecosystem: docker
+    directory: "/"           # watches the FROM lines in the Dockerfile
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: github-actions
+    directory: "/"           # watches the `uses:` versions in the workflow
+    schedule:
+      interval: monthly
