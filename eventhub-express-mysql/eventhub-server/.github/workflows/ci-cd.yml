@@ -76,8 +76,25 @@ jobs:
         # this, a broken <%= %> only shows up as a 500 in the browser.
         run: npm run check:views
 
+
   # ======================================================================
-  # 2. TEST — Jest + Supertest against a real MySQL 8 service container.
+  # 2. GITLEAKS — Scan the repository for exposed secrets before testing
+  #    and building the application.
+  # ======================================================================
+  gitleaks:
+    name: Secret scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Scan repository for secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ======================================================================
+  # 3. TEST — Jest + Supertest against a real MySQL 8 service container.
   #    Real database, not a mock: the routes are full of raw SQL, so a mock
   #    would prove nothing.
   # ======================================================================
@@ -147,12 +164,12 @@ jobs:
           retention-days: 7
 
   # ======================================================================
-  # 3. BUILD — build the production image, prove it actually boots and
+  # 4. BUILD — build the production image, prove it actually boots and
   #    serves traffic, scan it for CVEs, then publish (main only).
   # ======================================================================
   build:
     name: Build, smoke test & scan image
-    needs: [lint, test]
+    needs: [lint, gitleaks, test]
     runs-on: ubuntu-latest
 
     permissions:
@@ -325,7 +342,7 @@ jobs:
           echo "Pushed \`${{ steps.image.outputs.ref }}\`" >> "$GITHUB_STEP_SUMMARY"
 
   # ======================================================================
-  # 4. DEPLOY — main only. Pulls the exact SHA-tagged image onto the server
+  # 5. DEPLOY — main only. Pulls the exact SHA-tagged image onto the server
   #    and restarts the container. Rolls back automatically if the new
   #    container does not become healthy.
   #
@@ -370,7 +387,7 @@ jobs:
 #        run: rm -f ~/.ssh/deploy_key
 
   # ======================================================================
-  # 5. VERIFY — hit the real public URL. The deploy job checks the
+  # 6. VERIFY — hit the real public URL. The deploy job checks the
   #    container is healthy on the box; this checks it's healthy through
   #    the firewall, from the outside.
   # ======================================================================
