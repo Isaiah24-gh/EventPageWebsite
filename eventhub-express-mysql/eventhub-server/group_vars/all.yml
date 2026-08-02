@@ -1,0 +1,16 @@
+---
+app_user: ubuntu
+app_dir: /home/ubuntu/eventhub
+repo_url: https://github.com/Isaiah24-gh/EventPageWebsite.git
+repo_version: main
+
+compose_dir: "{{ app_dir }}/eventhub-express-mysql/eventhub-server"
+
+db_host: db
+db_port: 3306
+db_user: root
+db_password: password
+db_name: eventhub
+
+session_secret: "a-long-random-string-for-the-demo-change-in-production"
+app_port: 3000
