@@ -24,4 +24,12 @@ module.exports = {
   // Nothing enforced yet — set real numbers once Member 4's suite lands,
   // then CI will fail if coverage regresses.
   // coverageThreshold: { global: { lines: 40, statements: 40 } },
+  coverageThreshold: {
+    global: {
+      statements: 30,
+      branches: 15,
+      functions: 15,
+      lines: 30,
+    },
+  }
 };

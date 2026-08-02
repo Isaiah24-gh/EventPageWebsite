@@ -1,0 +1,310 @@
+# ==========================================================================
+# EventHub — CI/CD Pipeline (Railway)
+# OWNERSHIP: Member 1 (CI/CD)
+#
+#     lint ──┐
+#            ├──→ build ──→ scan ──→ deploy ──→ verify
+#     test ──┘   (image     (Trivy)  (railway   (curl
+#                 + smoke)            up)       /healthz)
+#
+# Repo layout: repo root is EventPageWebsite/; the app lives two levels down
+# at eventhub-express-mysql/eventhub-server/.
+# Every npm step therefore runs with working-directory: eventhub-express-mysql/eventhub-server.
+#
+# Deploy and verify are main-only. A PR runs lint/test/build/scan and stops.
+# ==========================================================================
+name: CI/CD
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Initiative #1: cancel superseded runs. Two merges in quick succession would
+# otherwise race each other into `railway up` and the later deploy could land
+# before the earlier one finishes.
+concurrency:
+  group: cicd-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: "20"
+  APP_DIR: eventhub-express-mysql/eventhub-server
+  RAILWAY_SERVICE: eventhub-server      # <-- set to your Railway service name
+
+jobs:
+  # ======================================================================
+  # 1. LINT — ~40s, no database. Cheapest check runs first.
+  # ======================================================================
+  lint:
+    name: Lint & static checks
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: eventhub-express-mysql/eventhub-server
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: eventhub-express-mysql/eventhub-server/package-lock.json
+
+      - run: npm ci
+
+      - name: Fail if .env is tracked in git
+        run: |
+          if git ls-files --error-unmatch .env >/dev/null 2>&1; then
+            echo "::error file=.env::.env is committed. Remove it and rotate every credential inside."
+            exit 1
+          fi
+
+      - run: npm run lint
+      - run: npm run check:views
+
+  # ======================================================================
+  # 2. TEST — Jest + Supertest against a real MySQL 8 service container.
+  # ======================================================================
+  test:
+    name: Unit & integration tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: eventhub-express-mysql/eventhub-server
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ci-root-password
+          MYSQL_DATABASE: eventhub
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -pci-root-password"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=15
+
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USER: root
+      # Throwaway credentials for a container that is destroyed in 90 seconds.
+      # Production values live in Railway's own variables, not here.
+      DB_PASSWORD: ci-root-password
+      DB_NAME: eventhub
+      SESSION_SECRET: ci-only-not-a-real-secret
+      NODE_ENV: test
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: eventhub-express-mysql/eventhub-server/package-lock.json
+
+      - run: npm ci
+
+      - name: Apply schema and migrations
+        # migration_add_profile_fields.sql is deliberately skipped — schema.sql
+        # already creates avatar_url and bio, so it would fail on a duplicate
+        # column. The gender and orders migrations ARE required: schema.sql
+        # lacks both, but routes/auth.js, account.js and ticketing.js query them.
+        run: |
+          mysql -h 127.0.0.1 -uroot -pci-root-password < database/schema.sql
+          mysql -h 127.0.0.1 -uroot -pci-root-password < database/migration_add_gender_field.sql
+          mysql -h 127.0.0.1 -uroot -pci-root-password < database/migration_add_orders_table.sql
+
+      - run: npm run seed
+      - run: npm run test:coverage
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: eventhub-express-mysql/eventhub-server/coverage/
+          retention-days: 7
+
+  # ======================================================================
+  # 3. BUILD — build the image, start it, prove it serves traffic.
+  #
+  # NOTE: Railway builds from source, so this image is NOT the artefact
+  # that ships. It is a pre-flight check that the Dockerfile is valid and
+  # the app boots inside a container — which is exactly what Railway will
+  # do minutes later, from the same Dockerfile and the same commit.
+  # ======================================================================
+  build:
+    name: Build image & smoke test
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ci-root-password
+          MYSQL_DATABASE: eventhub
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -pci-root-password"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=15
+
+    steps:
+      - uses: actions/checkout@v5
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build
+        uses: docker/build-push-action@v6
+        with:
+          context: ./eventhub-express-mysql/eventhub-server      # monorepo: context is the app dir
+          load: true
+          tags: eventhub:ci
+          # Initiative #2: layer cache persisted across runs. First build
+          # ~2min, subsequent builds ~20s when only app code changed.
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Prepare database
+        run: |
+          cd eventhub-express-mysql/eventhub-server
+          mysql -h 127.0.0.1 -uroot -pci-root-password < database/schema.sql
+          mysql -h 127.0.0.1 -uroot -pci-root-password < database/migration_add_gender_field.sql
+          mysql -h 127.0.0.1 -uroot -pci-root-password < database/migration_add_orders_table.sql
+
+      - name: Start container
+        run: |
+          docker run -d --name eventhub-ci --network host \
+            -e NODE_ENV=production -e PORT=3000 \
+            -e DB_HOST=127.0.0.1 -e DB_PORT=3306 \
+            -e DB_USER=root -e DB_PASSWORD=ci-root-password -e DB_NAME=eventhub \
+            -e SESSION_SECRET=ci-only-not-a-real-secret \
+            eventhub:ci
+
+      - name: Smoke test
+        run: |
+          for i in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:3000/healthz > /tmp/h.json && break
+            [ "$i" = 30 ] && { echo "::error::App never became healthy"; exit 1; }
+            sleep 2
+          done
+          cat /tmp/h.json
+          grep -q '"db":"up"' /tmp/h.json || { echo "::error::Up but cannot reach MySQL"; exit 1; }
+          curl -fsS -o /dev/null http://127.0.0.1:3000/      || { echo "::error::Homepage failed"; exit 1; }
+          curl -fsS -o /dev/null http://127.0.0.1:3000/login || { echo "::error::Login page failed"; exit 1; }
+          [ "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/nope)" = "404" ] \
+            || { echo "::error::404 handler broken"; exit 1; }
+
+      - name: Container logs (on failure)
+        if: failure()
+        run: docker logs eventhub-ci || true
+
+      - if: always()
+        run: docker rm -f eventhub-ci || true
+
+  # ======================================================================
+  # 4. SCAN — separate job so the spec's `needs: [test, scan]` gate is real.
+  # Rebuilds from the layer cache, so this costs ~20s, not a full build.
+  # ======================================================================
+  scan:
+    name: Vulnerability scan
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Rebuild from cache
+        uses: docker/build-push-action@v6
+        with:
+          context: ./eventhub-express-mysql/eventhub-server
+          load: true
+          tags: eventhub:scan
+          cache-from: type=gha
+
+      - name: Trivy — image CVEs
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: eventhub:scan
+          format: table
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          # Report-only for now. Flip to "1" once you've seen clean runs and
+          # the scan becomes a real gate.
+          exit-code: "0"
+
+      - name: Trivy — dependency CVEs
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: eventhub-express-mysql/eventhub-server
+          format: table
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "0"
+
+  # ======================================================================
+  # 5. DEPLOY — main only.
+  #
+  # RAILWAY_TOKEN is a project token stored as a GitHub secret. It is
+  # injected into this job's environment at runtime and never exists in the
+  # repository. `railway up` reads it from the environment — the CLI is
+  # never interactively logged in, and the token is masked in logs.
+  # ======================================================================
+  deploy:
+    name: Deploy to Railway
+    needs: [test, scan]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    container: ghcr.io/railwayapp/cli:latest   # official image, CLI preinstalled
+    environment:
+      name: production
+      url: ${{ vars.APP_URL }}
+
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Deploy
+        # --path-as-root is required for the monorepo: without it Railway
+        # archives from the repo root and the Dockerfile is not at the top
+        # of the upload. --ci streams build logs then exits when the build
+        # completes, rather than tailing runtime logs forever.
+        run: railway up ${{ env.APP_DIR }} --path-as-root --ci --service ${{ env.RAILWAY_SERVICE }}
+
+  # ======================================================================
+  # 6. VERIFY — hit the public URL. Railway reporting "deployed" only means
+  # the build succeeded; this proves the app actually answers.
+  # ======================================================================
+  verify:
+    name: Verify production
+    needs: deploy
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Poll /healthz
+        run: |
+          for i in $(seq 1 20); do
+            if curl -fsS "${{ vars.APP_URL }}/healthz" | tee /tmp/p.json | grep -q '"status":"ok"'; then
+              echo "Production healthy."
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::Production did not report healthy after deploy."
+          cat /tmp/p.json 2>/dev/null || true
+          echo "Roll back from the Railway dashboard: service → Deployments → previous → Redeploy"
+          exit 1
