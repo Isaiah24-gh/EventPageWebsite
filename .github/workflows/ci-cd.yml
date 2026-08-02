@@ -224,8 +224,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
       - uses: docker/setup-buildx-action@v3
 
+      
       - name: Rebuild from cache
         uses: docker/build-push-action@v6
         with:
