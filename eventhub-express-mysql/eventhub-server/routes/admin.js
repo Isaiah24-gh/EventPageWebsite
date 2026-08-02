@@ -159,11 +159,11 @@ router.post("/reports/:id/delete-review", async (req, res, next) => {
       return res.redirect("/admin/reports");
     }
 
-    await pool.query("DELETE FROM reviews WHERE id = ?", [report.target_id]);
+    await pool.query("UPDATE reviews SET status = 'removed' WHERE id = ?", [report.target_id]);
     await pool.query("UPDATE reports SET status = 'resolved' WHERE id = ?", [req.params.id]);
     await pool.query("UPDATE reports SET status = 'resolved' WHERE target_type = 'review' AND target_id = ?", [report.target_id]);
-    await logAction(req.session.user.id, `Deleted review and resolved report`, "review", report.target_id);
-    req.flash("success", "Review removed from the database and report resolved.");
+    await logAction(req.session.user.id, `Hid review and resolved report`, "review", report.target_id);
+    req.flash("success", "Review hidden and report resolved.");
     res.redirect("/admin/reports");
   } catch (err) {
     next(err);

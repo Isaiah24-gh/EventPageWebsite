@@ -39,3 +39,76 @@
 }
 
 .review-date { color: var(--ink-soft); font-weight: 400; }
+
+.rating-summary {
+  display: flex;
+  gap: 28px;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.rating-summary-score {
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.rating-summary-value {
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 2.2rem;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.rating-summary-count {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  margin-top: 4px;
+}
+
+.rating-breakdown {
+  flex: 1;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rating-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rating-row-stars {
+  color: var(--marigold);
+  font-size: 0.78rem;
+  letter-spacing: 1px;
+  width: 78px;
+  flex-shrink: 0;
+}
+
+.rating-row-track {
+  flex: 1;
+  height: 8px;
+  border-radius: 0 4px 4px 0;
+  background: rgba(242, 169, 59, 0.18);
+  overflow: hidden;
+}
+
+.rating-row-fill {
+  display: block;
+  height: 100%;
+  border-radius: 0 4px 4px 0;
+  background: var(--marigold);
+}
+
+.rating-row-pct {
+  width: 34px;
+  flex-shrink: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
