@@ -7,8 +7,9 @@
 #     test ──┘   (image     (Trivy)  (railway   (curl
 #                 + smoke)            up)       /healthz)
 #
-# Repo layout: root is eventhub-express-mysql/, app lives in eventhub-server/.
-# Every npm step therefore runs with working-directory: eventhub-server.
+# Repo layout: repo root is EventPageWebsite/; the app lives two levels down
+# at eventhub-express-mysql/eventhub-server/.
+# Every npm step therefore runs with working-directory: eventhub-express-mysql/eventhub-server.
 #
 # Deploy and verify are main-only. A PR runs lint/test/build/scan and stops.
 # ==========================================================================
@@ -33,7 +34,7 @@ permissions:
 
 env:
   NODE_VERSION: "20"
-  APP_DIR: eventhub-server
+  APP_DIR: eventhub-express-mysql/eventhub-server
   RAILWAY_SERVICE: eventhub-server      # <-- set to your Railway service name
 
 jobs:
@@ -45,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: eventhub-server
+        working-directory: eventhub-express-mysql/eventhub-server
     steps:
       - uses: actions/checkout@v5
 
@@ -53,7 +54,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
-          cache-dependency-path: eventhub-server/package-lock.json
+          cache-dependency-path: eventhub-express-mysql/eventhub-server/package-lock.json
 
       - run: npm ci
 
@@ -75,7 +76,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: eventhub-server
+        working-directory: eventhub-express-mysql/eventhub-server
 
     services:
       mysql:
@@ -109,7 +110,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
-          cache-dependency-path: eventhub-server/package-lock.json
+          cache-dependency-path: eventhub-express-mysql/eventhub-server/package-lock.json
 
       - run: npm ci
 
@@ -130,7 +131,7 @@ jobs:
         if: always()
         with:
           name: coverage-report
-          path: eventhub-server/coverage/
+          path: eventhub-express-mysql/eventhub-server/coverage/
           retention-days: 7
 
   # ======================================================================
@@ -167,7 +168,7 @@ jobs:
       - name: Build
         uses: docker/build-push-action@v6
         with:
-          context: ./eventhub-server      # monorepo: context is the app dir
+          context: ./eventhub-express-mysql/eventhub-server      # monorepo: context is the app dir
           load: true
           tags: eventhub:ci
           # Initiative #2: layer cache persisted across runs. First build
@@ -177,7 +178,7 @@ jobs:
 
       - name: Prepare database
         run: |
-          cd eventhub-server
+          cd eventhub-express-mysql/eventhub-server
           mysql -h 127.0.0.1 -uroot -pci-root-password < database/schema.sql
           mysql -h 127.0.0.1 -uroot -pci-root-password < database/migration_add_gender_field.sql
           mysql -h 127.0.0.1 -uroot -pci-root-password < database/migration_add_orders_table.sql
@@ -227,7 +228,7 @@ jobs:
       - name: Rebuild from cache
         uses: docker/build-push-action@v6
         with:
-          context: ./eventhub-server
+          context: ./eventhub-express-mysql/eventhub-server
           load: true
           tags: eventhub:scan
           cache-from: type=gha
@@ -247,7 +248,7 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: fs
-          scan-ref: eventhub-server
+          scan-ref: eventhub-express-mysql/eventhub-server
           format: table
           severity: CRITICAL,HIGH
           ignore-unfixed: true
