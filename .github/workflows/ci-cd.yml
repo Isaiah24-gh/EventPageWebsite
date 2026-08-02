@@ -35,7 +35,8 @@ permissions:
 env:
   NODE_VERSION: "20"
   APP_DIR: eventhub-express-mysql/eventhub-server
-  RAILWAY_SERVICE: eventhub-server      # <-- set to your Railway service name
+  RAILWAY_SERVICE: EventPageWebsite
+  APP_URL: https://eventpagewebsite-production.up.railway.app
 
 jobs:
   # ======================================================================
@@ -173,8 +174,10 @@ jobs:
           tags: eventhub:ci
           # Initiative #2: layer cache persisted across runs. First build
           # ~2min, subsequent builds ~20s when only app code changed.
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=${{ github.ref }}
+          cache-to: type=gha,scope=${{ github.ref }},mode=max
+
+
 
       - name: Prepare database
         run: |
@@ -223,15 +226,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
       - uses: docker/setup-buildx-action@v3
 
+      
       - name: Rebuild from cache
         uses: docker/build-push-action@v6
         with:
           context: ./eventhub-express-mysql/eventhub-server
           load: true
           tags: eventhub:scan
-          cache-from: type=gha
+          cache-from: type=gha,scope=${{ github.ref }}
+          cache-to: type=gha,scope=${{ github.ref }},mode=max
+
+
+    
+      # ===========================
+      # Gitleaks Secret Scan
+      # ===========================
+      - name: Gitleaks - Secret Scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Trivy — image CVEs
         uses: aquasecurity/trivy-action@master
@@ -270,7 +287,7 @@ jobs:
     container: ghcr.io/railwayapp/cli:latest   # official image, CLI preinstalled
     environment:
       name: production
-      url: ${{ vars.APP_URL }}
+      url: ${{ env.APP_URL }}
 
     env:
       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
@@ -298,7 +315,7 @@ jobs:
       - name: Poll /healthz
         run: |
           for i in $(seq 1 20); do
-            if curl -fsS "${{ vars.APP_URL }}/healthz" | tee /tmp/p.json | grep -q '"status":"ok"'; then
+            if curl -fsS "${{ env.APP_URL }}/healthz" | tee /tmp/p.json | grep -q '"status":"ok"'; then
               echo "Production healthy."
               exit 0
             fi
