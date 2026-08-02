@@ -8,6 +8,7 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../config/db");
+const { sendTicketConfirmationEmail } = require("../config/mail");
 
 router.get("/:eventId", async (req, res, next) => {
   try {
@@ -52,17 +53,41 @@ router.post("/checkout", async (req, res, next) => {
 
     const qtyInt = parseInt(quantity, 10);
     const totalAmount = event.price * qtyInt;
-    
-    const generatedTxnId = "TXN-" + Date.now(); 
-    const paymentSuccess = true; 
+
+    const generatedTxnId = "TXN-" + Date.now();
+    const paymentSuccess = true;
 
     if (paymentSuccess) {
       const sql = `INSERT INTO orders (user_id, event_id, quantity, total_paid, transaction_id, status) 
                    VALUES (?, ?, ?, ?, ?, ?)`;
-      
+
       await pool.query(sql, [userId, eventId, qtyInt, totalAmount, generatedTxnId, "Paid"]);
 
-      return res.render("payment-success", { 
+      // ---- Feature 4: purchase confirmation email ----
+      // Prefers the contact address on the user's email preferences, which is
+      // deliberately separate from the address they log in with. Users who have
+      // never saved their preferences have no row yet, so we fall back to the
+      // account email. Wrapped in its own try/catch: the order is already saved,
+      // so a mail failure must not turn a purchase into an error page.
+      try {
+        const [prefRows] = await pool.query(
+          "SELECT contact_email FROM email_preferences WHERE user_id = ?",
+          [userId]
+        );
+        const contactEmail =
+          (prefRows[0] && prefRows[0].contact_email) || req.session.user.email;
+
+        await sendTicketConfirmationEmail(contactEmail, req.session.user.name, {
+          event,
+          quantity: qtyInt,
+          totalPaid: totalAmount,
+          transactionId: generatedTxnId
+        });
+      } catch (mailErr) {
+        console.error("Failed to send ticket confirmation email:", mailErr);
+      }
+
+      return res.render("payment-success", {
         title: "Purchase Confirmed",
         transactionId: generatedTxnId,
         totalAmount: totalAmount
