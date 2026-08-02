@@ -167,7 +167,7 @@ jobs:
       - uses: docker/setup-buildx-action@v3
 
       - name: Build
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: ./eventhub-express-mysql/eventhub-server      # monorepo: context is the app dir
           load: true
@@ -230,7 +230,7 @@ jobs:
 
       
       - name: Rebuild from cache
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: ./eventhub-express-mysql/eventhub-server
           load: true
