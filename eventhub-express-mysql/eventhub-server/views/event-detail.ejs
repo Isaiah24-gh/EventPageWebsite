@@ -47,31 +47,63 @@
     <p class="eyebrow">Feature 3 · Reviews &amp; Comments</p>
     <div class="section-title">
       <h2>Attendee reviews</h2>
-      <span class="badge"><%= avgRating ? `★ ${avgRating} · ${reviews.length} review${reviews.length === 1 ? '' : 's'}` : 'No reviews yet' %></span>
+      <% if (!avgRating) { %>
+        <span class="badge">No reviews yet</span>
+      <% } %>
     </div>
 
-    <form id="review-form" class="card" method="POST" action="/events/<%= event.id %>/reviews" style="margin-bottom:28px;">
-      <div class="field">
-        <label for="rev-name">Your name</label>
-        <input type="text" id="rev-name" name="name" required autocomplete="name" value="<%= currentUser ? currentUser.name : '' %>">
-      </div>
-      <div class="field">
-        <label>Rating</label>
-        <input type="hidden" name="rating" id="rating-input" value="0">
-        <div class="star-input" id="star-input" role="radiogroup" aria-label="Rating">
-          <button type="button" class="star" data-value="1" aria-label="1 star">★</button>
-          <button type="button" class="star" data-value="2" aria-label="2 stars">★</button>
-          <button type="button" class="star" data-value="3" aria-label="3 stars">★</button>
-          <button type="button" class="star" data-value="4" aria-label="4 stars">★</button>
-          <button type="button" class="star" data-value="5" aria-label="5 stars">★</button>
+    <% if (avgRating) { %>
+      <div class="rating-summary">
+        <div class="rating-summary-score">
+          <div class="rating-summary-value"><%= avgRating %></div>
+          <div class="review-stars"><%= '★'.repeat(Math.round(avgRating)) + '☆'.repeat(5 - Math.round(avgRating)) %></div>
+          <div class="rating-summary-count"><%= reviews.length %> review<%= reviews.length === 1 ? '' : 's' %></div>
+        </div>
+        <div class="rating-breakdown">
+          <% ratingBreakdown.forEach(row => { %>
+            <div class="rating-row">
+              <span class="rating-row-stars"><%= '★'.repeat(row.stars) + '☆'.repeat(5 - row.stars) %></span>
+              <span class="rating-row-track"><span class="rating-row-fill" style="width:<%= row.pct %>%"></span></span>
+              <span class="rating-row-pct"><%= row.pct %>%</span>
+            </div>
+          <% }) %>
         </div>
       </div>
-      <div class="field">
-        <label for="rev-comment">Comment</label>
-        <textarea id="rev-comment" name="comment" rows="3" required placeholder="How was it? Would you recommend it?"></textarea>
+    <% } %>
+
+    <% if (currentUser) { %>
+      <form id="review-form" class="card" method="POST" action="/events/<%= event.id %>/reviews" style="margin-bottom:28px;">
+        <div class="field">
+          <label for="rev-name">Your name</label>
+          <input type="text" id="rev-name" value="<%= currentUser.name %>" readonly disabled>
+        </div>
+        <div class="field">
+          <label>Rating</label>
+          <input type="hidden" name="rating" id="rating-input" value="0">
+          <div class="star-input" id="star-input" role="radiogroup" aria-label="Rating">
+            <button type="button" class="star" data-value="1" aria-label="1 star">★</button>
+            <button type="button" class="star" data-value="2" aria-label="2 stars">★</button>
+            <button type="button" class="star" data-value="3" aria-label="3 stars">★</button>
+            <button type="button" class="star" data-value="4" aria-label="4 stars">★</button>
+            <button type="button" class="star" data-value="5" aria-label="5 stars">★</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="rev-comment">Comment</label>
+          <textarea id="rev-comment" name="comment" rows="3" required placeholder="How was it? Would you recommend it?"></textarea>
+        </div>
+        <button type="submit" class="btn">Post Review</button>
+      </form>
+    <% } else { %>
+      <div class="card empty-state" style="margin-bottom:28px;">
+        <h3>Log in to leave a review</h3>
+        <p>Create an account or log in so your review is tied to your profile name.</p>
+        <div style="display:flex;gap:12px;margin-top:12px;">
+          <a class="btn" href="/login">Log In</a>
+          <a class="btn btn-secondary" href="/register">Sign Up</a>
+        </div>
       </div>
-      <button type="submit" class="btn">Post Review</button>
-    </form>
+    <% } %>
 
     <% if (reviews.length) { %>
       <% reviews.forEach(r => { %>
@@ -82,9 +114,23 @@
           </div>
           <div class="review-stars"><%= '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating) %></div>
           <p style="margin:6px 0 4px 0;"><%= r.comment %></p>
-          <form action="/events/reviews/<%= r.id %>/report" method="POST" style="margin:0;">
-            <button type="submit" class="btn btn-secondary btn-sm">⚑ Report</button>
-          </form>
+          <div style="display:flex;gap:8px;">
+            <% if (currentUser && currentUser.id === r.user_id) { %>
+              <details style="display:inline-block;">
+                <summary class="btn btn-secondary btn-sm" style="cursor:pointer;list-style:none;">✎ Edit</summary>
+                <form action="/events/reviews/<%= r.id %>/edit" method="POST" class="card" style="margin-top:10px;max-width:340px;">
+                  <div class="field">
+                    <label for="edit-comment-<%= r.id %>">Comment</label>
+                    <textarea name="comment" id="edit-comment-<%= r.id %>" rows="3" required><%= r.comment %></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-sm">Save</button>
+                </form>
+              </details>
+            <% } %>
+            <form action="/events/reviews/<%= r.id %>/report" method="POST" style="margin:0;">
+              <button type="submit" class="btn btn-secondary btn-sm">⚑ Report</button>
+            </form>
+          </div>
         </div>
       <% }) %>
     <% } else { %>
