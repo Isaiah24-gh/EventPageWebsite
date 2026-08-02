@@ -174,8 +174,9 @@ jobs:
           tags: eventhub:ci
           # Initiative #2: layer cache persisted across runs. First build
           # ~2min, subsequent builds ~20s when only app code changed.
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=${{ github.ref }}
+          cache-to: type=gha,scope=${{ github.ref }},mode=max,ignore-error=true
+
 
       - name: Prepare database
         run: |
@@ -235,7 +236,9 @@ jobs:
           context: ./eventhub-express-mysql/eventhub-server
           load: true
           tags: eventhub:scan
-          cache-from: type=gha
+          cache-from: type=gha,scope=${{ github.ref }}
+          cache-to: type=gha,scope=${{ github.ref }},mode=max,ignore-error=true
+
     
       # ===========================
       # Gitleaks Secret Scan
