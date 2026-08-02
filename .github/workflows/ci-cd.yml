@@ -233,6 +233,14 @@ jobs:
           load: true
           tags: eventhub:scan
           cache-from: type=gha
+    
+      # ===========================
+      # Gitleaks Secret Scan
+      # ===========================
+      - name: Gitleaks - Secret Scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Trivy — image CVEs
         uses: aquasecurity/trivy-action@master
