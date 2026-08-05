@@ -8,7 +8,7 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../config/db");
 
-const x = someUndefinedThing;
+
 
 router.get("/", async (req, res, next) => {
   try {
